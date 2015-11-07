@@ -1,12 +1,16 @@
-from django.db import models
-from django.db.models.signals import pre_save
-from django.conf import settings
+import warnings
 
-from .signals import save_spent_time, create_montly_report, \
-    create_montly_invoice
+from datetime import datetime, timedelta
+
+from django.db import models
+from django.conf import settings
+from django.template import Context
+from django.template.loader import get_template
+from django.core.files.base import ContentFile
+
 from .choices import STATUS, PRIORITY, MONTH, CURRENCY
 from .utils.datetime_helpers import tz, current_datetime, current_month, \
-    current_year, get_month_abbr
+    current_year, get_month_abbr, get_month_days, get_month_name
 
 
 class SpentTime(models.Model):
@@ -15,16 +19,31 @@ class SpentTime(models.Model):
     comment = models.CharField(max_length=200)
     duration = models.FloatField(default=0)
     task = models.ForeignKey('Task', related_name='times')
+    worker = models.ForeignKey(settings.AUTH_USER_MODEL)
 
     @property
     def cost(self):
-        employer = self.task.project.company
-        if employer:
-            return '%.2f %s' % (self.duration * employer.hourly_rate,
-                                employer.salary_currency)
+        """
+        Feature request:
+            - cost is should be depend on salary in company and
+              type of working activity, becasue since we can add more than
+              one salary position in one company, we want get different
+              hourly rates and show appropriate 'cost' of working time
+        """
+        # temporary implementation
+        warnings.simplefilter("always")
+        warnings.warn(
+            'SpentTime.cost would be depend on type of working activity',
+            FutureWarning)
+        salary = self.task.project.company.salary_set.filter(
+            worker=self.worker)
+        if salary:
+            return '%.2f %s' % (self.duration * salary[0].hourly_rate,
+                                salary[0].currency)
+        return '-//-'
 
     @property
-    def times(self):
+    def period(self):
         return '%s - %s' % (self.start_time.astimezone(tz).strftime('%H:%M'),
                             self.end_time.astimezone(tz).strftime('%H:%M'))
 
@@ -35,6 +54,10 @@ class SpentTime(models.Model):
     @property
     def title(self):
         return str(self)
+
+    def save(self, *args, **kwargs):
+        self.end_time = self.start_time + timedelta(hours=self.duration)
+        super(SpentTime, self).save(*args, **kwargs)
 
     def __str__(self):
         return '%s - %sh' % (self.task, self.duration)
@@ -92,10 +115,6 @@ class Project(models.Model):
 class Company(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
-    hourly_rate = models.FloatField(blank=True, null=True)
-    salary_currency = models.CharField(blank=True, null=True,
-                                       max_length=3, choices=CURRENCY)
-    invoice_abbr = models.CharField(max_length=20, blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -122,6 +141,36 @@ class MonthlyReport(models.Model):
                 month=get_month_abbr(self.month),
                 year=self.year
             )
+
+    def save(self, *args, **kwargs):
+        _, last_month_day = get_month_days(self.year, self.month)
+
+        report_period_start = datetime(self.year, self.month, 1, tzinfo=tz)
+        report_period_end = datetime(
+            self.year, self.month, last_month_day, 23, 59, 59, tzinfo=tz)
+
+        spent_times = SpentTime.objects.filter(
+            task__project=self.project, worker=self.worker,
+            start_time__gte=report_period_start,
+            end_time__lte=report_period_end)
+
+        data = {
+            'month': get_month_name(self.month),
+            'year': self.year,
+            'spent_times': sorted(spent_times, reverse=True),
+            'month_hours': sum([x.duration for x in spent_times])
+        }
+
+        tpl = get_template('timesheet/report.txt')
+        report_text = tpl.render(Context(data))
+
+        if self.filename:
+            self.filename.delete(save=False)
+
+        self.filename.save(
+            self.title, ContentFile(report_text), save=False
+        )
+        super(MonthlyReport, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.title
@@ -184,7 +233,17 @@ class CompanyInvoiceData(InvoiceData):
     entity = models.OneToOneField('Company')
 
 
-# Please declare signals here, do not put them to __init__.py:
-pre_save.connect(save_spent_time, sender=SpentTime)
-pre_save.connect(create_montly_report, sender=MonthlyReport)
-pre_save.connect(create_montly_invoice, sender=MonthlyInvoice)
+class Salary(models.Model):
+    company = models.ForeignKey('Company')
+    worker = models.ForeignKey(settings.AUTH_USER_MODEL)
+    position = models.CharField(blank=True, null=True, max_length=50)
+    hourly_rate = models.FloatField()
+    currency = models.CharField(max_length=3, choices=CURRENCY)
+
+    def __str__(self):
+        return '%s - %s %s per hour' % (
+            self.worker, self.hourly_rate, self.currency)
+
+    class Meta:
+        verbose_name = 'salary'
+        verbose_name_plural = 'salaries'
