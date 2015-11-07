@@ -46,8 +46,8 @@ Clone project, create your personal config and change default settings:
 (py2)$ git clone ssh://git@gitlab.server.com/work-time-tracking.git
 (py2)$ cd work-time-tracking
 (py2)$ cp config.ini.example config.ini
-(py2)$ # !!!DO NOT FORGET!!! change default settings in config.ini
 ```
+__ DO NOT FORGET change default settings in config.ini __
 
 ### you can use Docker(optionally):
 
@@ -94,3 +94,20 @@ or for new production deployment(please do not forget change config.ini):
 ```shell
 (py2)$ fab deploy:live
 ```
+
+start all system services(Nginx, uWSGI backend, redis etc):
+
+```shell
+(py2)$ fab restart_services
+```
+
+open 'http://wktime.local/admin/' (or other wktime URL - depend on your settings in config.ini) in your browser, that's all!
+
+
+__ DO NOT FORGET set the value of csrftoken cookie to your cookie_csrftoken, otherwise you get 403 HTTP Forbidden error! __
+
+
+
+__Developer/Sysadmin:__
+
+2015, Andrew Burdyug
