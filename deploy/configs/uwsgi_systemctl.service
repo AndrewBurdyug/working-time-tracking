@@ -1,0 +1,17 @@
+[Unit]
+Description=uWSGI for {{ System.user }}
+After=local-fs.target
+
+[Service]
+Type =  forking
+User = {{ System.user }}
+Group = {{ System.group }}
+PIDFile = /tmp/uwsgi-{{ System.user }}.pid
+WorkingDirectory = {{ System.home }}
+ExecStart = /usr/bin/bash -c '. ~/py3/bin/activate && uwsgi --ini uwsgi.ini'
+ExecStop = /usr/bin/kill -INT $MAINPID
+ExecReload = /usr/bin/kill -TERM $MAINPID
+RemainAfterExit = yes
+
+[Install]
+WantedBy=multi-user.target

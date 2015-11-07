@@ -1,0 +1,33 @@
+[Main]
+project_name_dev = wktime.local
+project_name_live = wktime.example.org
+ssh_dev = wktime.local
+ssh_live = wktime.example.org:22
+debug_dev = True
+debug_live = False
+timezone = Europe/Moscow
+django_secret_key_dev = YourSecretRandomPhrase1
+django_secret_key_live = YourSecretRandomPhrase2
+
+[System]
+super_user = root
+user = wktime
+group = wktime
+home = /home/wktime
+
+[Git]
+repo_path = ssh://git@gitlab.server.com/work-time-tracking.git
+server = gitlab.server.com:22
+
+[Nginx]
+server_name_dev = wktime.local
+server_name_live = wktime.example.org
+access_log = ${System:home}/logs/nginx.access.log
+error_log = ${System:home}/logs/nginx.error.log
+error_log_level = info
+document_root = ${System:home}/src
+cookie_csrftoken = YourSecretRandomPhrase3
+
+[uWSGI]
+chdir = src
+wsgi_file = working_time/wsgi.py
