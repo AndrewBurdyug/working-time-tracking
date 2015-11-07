@@ -1,27 +1,34 @@
 ### Django project folders
 
 + */deploy/configs*
+
     contains Jinja2 templates for Nginx, uWSGI, Systemctl
 
 + */deploy/requirements.txt*
+
     contains python modules which are used in project
 
 + */fabfile.py*
+
     contains instruction for project deploy, update, restart services, etc
 
 + */config.ini*
+
     it is a main config file of project, it contains all info about
     how project will run in system: system user account, system paths(document root, log files, etc),
     many different services options which are variable from username etc
 
 + */static*
+
     standart Django "static" folder, it contains static files(css, js, fonts, images),
     a content will be overwritten by the django collectstatic command
 
 + */media*
+
     standart Django "media" folder, it contains media files(txt, pdf): reports and invoices
 
 + */locale*
+
     a folder for where Django looks for translation files
 
 ## Deploy
@@ -47,7 +54,7 @@ Clone project, create your personal config and change default settings:
 (py2)$ cd work-time-tracking
 (py2)$ cp config.ini.example config.ini
 ```
-__ DO NOT FORGET change default settings in config.ini __
+__DO NOT FORGET change default settings in config.ini__
 
 ### you can use Docker(optionally):
 
@@ -104,7 +111,7 @@ start all system services(Nginx, uWSGI backend, redis etc):
 open 'http://wktime.local/admin/' (or other wktime URL - depend on your settings in config.ini) in your browser, that's all!
 
 
-__ DO NOT FORGET set the value of csrftoken cookie to your cookie_csrftoken, otherwise you get 403 HTTP Forbidden error! __
+__DO NOT FORGET set the value of csrftoken cookie to your cookie_csrftoken, otherwise you get 403 HTTP Forbidden error!__
 
 
 
