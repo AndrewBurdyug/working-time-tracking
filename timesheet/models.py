@@ -1,4 +1,5 @@
 import warnings
+import unicodedata
 
 from datetime import datetime, timedelta
 
@@ -12,8 +13,28 @@ from .choices import STATUS, PRIORITY, MONTH, CURRENCY
 from .utils.datetime_helpers import tz, current_datetime, current_month, \
     current_year, get_month_abbr, get_month_days, get_month_name
 
+from .utils.pdf_helpers import inverse_y, draw_header, draw_items_header, \
+    draw_legal_parties_info, draw_item, draw_items, draw_footer, draw, \
+    create_invoice
+
+
+currency_sign = {
+    'USD': '$',
+    'EUR': unicodedata.lookup('EURO SIGN'),
+    'RUB': 'руб.'
+    #  python unicodedata still not support ruble sign
+    # 'RUB': unicodedata.lookup('RUBLE SIGN')
+}
+
 
 class SpentTime(models.Model):
+    """
+    Feature request:
+        - workers can track their working time only for tasks,
+          for which of them are participants(on Redmine maner),
+          maybe this should be realized on the project level and
+          potentially workers can work on all project tasks...
+    """
     start_time = models.DateTimeField()
     end_time = models.DateTimeField(default=current_datetime)
     comment = models.CharField(max_length=200)
@@ -115,6 +136,12 @@ class Project(models.Model):
 class Company(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
+    abbr = models.SlugField(blank=True, null=True,
+                            help_text='company abbreviation')
+
+    @property
+    def slug(self):
+        return self.abbr if self.abbr else self.title.replace(' ', '_')
 
     def __str__(self):
         return self.title
@@ -188,6 +215,7 @@ class MonthlyInvoice(models.Model):
                                              choices=MONTH)
     currency_equivalent = models.CharField(blank=True, null=True, max_length=3,
                                            choices=CURRENCY)
+    amount_equivalent = models.FloatField(blank=True, null=True)
     date = models.DateTimeField(default=current_datetime,
                                 help_text='invoice sending date')
     number = models.PositiveSmallIntegerField(default=1)
@@ -197,10 +225,99 @@ class MonthlyInvoice(models.Model):
         return '{user}_{company}_{month}_{year}_Invoice.pdf' \
             .format(
                 user=self.worker.username,
-                company=self.company.title,
+                company=self.company.slug,
                 month=get_month_abbr(self.month),
                 year=self.year
             )
+
+    @property
+    def projects_amount(self):
+        _, last_month_day = get_month_days(self.year, self.month)
+        report_period_start = datetime(self.year, self.month, 1, tzinfo=tz)
+        report_period_end = datetime(
+            self.year, self.month, last_month_day, 23, 59, 59, tzinfo=tz)
+
+        projects = set(self.company.projects.filter(
+            tasks__times__worker=self.worker,
+            tasks__times__start_time__gte=report_period_start,
+            tasks__times__end_time__lte=report_period_end))
+
+        data = list()
+        for project in projects:
+            project_info = {'project': project, 'hours': 0, 'amount': 0,
+                            'currency': '-//-', 'hourly_rate': '-//-'}
+            salary = self.company.salary_set.filter(worker=self.worker)
+            if salary:
+                if salary[0].currency != 'RUB':
+                    project_info['hourly_rate'] = '%s%.2f' % (
+                        currency_sign.get(salary[0].currency, '?'),
+                        salary[0].hourly_rate)
+                else:
+                    project_info['hourly_rate'] = '%.2f %s' % (
+                        salary[0].hourly_rate, salary[0].currency)
+            for spent_time in SpentTime.objects.filter(
+                    task__project=project, worker=self.worker,
+                    start_time__gte=report_period_start,
+                    end_time__lte=report_period_end):
+                #  in most common cases, a company will pay salary for their
+                #  employees in one currency, no matter from type of working
+                #  activity or their positions, so we just save currency
+                #  expecting that it is constant
+                if spent_time.cost != '-//-':
+                    amount, project_info['currency'] = spent_time.cost.split()
+                    project_info['amount'] += float(amount)
+                else:
+                    project_info['currency'] = '?'
+                    project_info['amount'] = 0
+                project_info['hours'] += spent_time.duration
+
+            if project_info['currency'] != 'RUB':
+                project_info['currency'] = currency_sign.get(
+                    project_info['currency'], '?')
+
+            data.append(project_info)
+        return data
+
+    @property
+    def amount_eq(self):
+        if self.amount_equivalent and self.currency_equivalent:
+            if self.currency_equivalent != 'RUB':
+                return '%s%.2f' % (
+                    currency_sign.get(self.currency_equivalent, '?'),
+                    self.amount_equivalent)
+            return '%.2f %s' % (
+                self.amount_equivalent, self.currency_equivalent)
+
+    @property
+    def amount(self):
+        projects_data = self.projects_amount
+        if projects_data:
+            worker_total_amount = sum([x['amount'] for x in projects_data])
+            project_info = projects_data[0]
+            if project_info['currency'] != 'RUB':
+                return '%s%.2f' % (
+                    project_info['currency'], worker_total_amount)
+            else:
+                return '%.2f %s' % (
+                    worker_total_amount, project_info['currency'])
+        return '?0.00'
+
+    def save(self, *args, **kwargs):
+        if self.filename:
+            self.filename.delete(save=False)
+
+        self.filename = self.create_invoice()
+        super(MonthlyInvoice, self).save(*args, **kwargs)
+
+    inverse_y = inverse_y
+    draw_header = draw_header
+    draw_legal_parties_info = draw_legal_parties_info
+    draw_items_header = draw_items_header
+    draw_item = draw_item
+    draw_items = draw_items
+    draw_footer = draw_footer
+    draw = draw
+    create_invoice = create_invoice
 
     def __str__(self):
         return self.title
@@ -226,14 +343,21 @@ class InvoiceData(models.Model):
 
 
 class UserInvoiceData(InvoiceData):
-    entity = models.OneToOneField(settings.AUTH_USER_MODEL)
+    entity = models.OneToOneField(
+        settings.AUTH_USER_MODEL, related_name='iv_data')
 
 
 class CompanyInvoiceData(InvoiceData):
-    entity = models.OneToOneField('Company')
+    entity = models.OneToOneField('Company', related_name='iv_data')
 
 
 class Salary(models.Model):
+    """
+    Feature request:
+        - salary should be as more as possible close to the user profile,
+          we want fill this data on the user settings page
+          as well as we fill the user invoice data there...
+    """
     company = models.ForeignKey('Company')
     worker = models.ForeignKey(settings.AUTH_USER_MODEL)
     position = models.CharField(blank=True, null=True, max_length=50)

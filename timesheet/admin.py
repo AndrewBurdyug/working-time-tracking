@@ -1,6 +1,8 @@
+from django import forms
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
+from django.core.exceptions import ValidationError
 from django.utils.timezone import get_current_timezone
 from .models import SpentTime, Category, Task, Project, MonthlyReport, \
     MonthlyInvoice, Company, CompanyInvoiceData, UserInvoiceData, Salary
@@ -14,7 +16,6 @@ class SpentTimeAdmin(admin.ModelAdmin):
     list_display = ('day', 'period', 'duration_pretty', 'cost', 'task',
                     'comment')
     list_filter = ('start_time', 'task__project__company', 'task__project')
-    fields = ('start_time', 'end_time_pretty', 'comment', 'duration', 'task')
     readonly_fields = ('end_time_pretty', )
     date_hierarchy = 'start_time'
 
@@ -30,8 +31,17 @@ class SpentTimeAdmin(admin.ModelAdmin):
             return qs
         return qs.filter(worker=request.user)
 
+    def get_fields(self, request, obj):
+        fields = ['start_time', 'end_time_pretty', 'comment', 'duration',
+                  'task']
+        if request.user.is_superuser:
+            fields.insert(2, 'worker')
+            return fields
+        return fields
+
     def save_model(self, request, obj, form, change):
-        obj.worker = request.user
+        if not request.user.is_superuser:
+            obj.worker = request.user
         obj.save()
 
     end_time_pretty.short_description = 'End time(auto)'
@@ -40,6 +50,7 @@ class SpentTimeAdmin(admin.ModelAdmin):
 
 class MonthlyReportAdmin(admin.ModelAdmin):
     list_display = ('title', 'report')
+    readonly_fields = ('filename', )
 
     def report(self, obj):
         return '<a href="{url}">{url}</a'.format(url=obj.filename.url)
@@ -48,8 +59,17 @@ class MonthlyReportAdmin(admin.ModelAdmin):
     report.allow_tags = True
 
 
+class MonthlyInvoiceAdminForm(forms.ModelForm):
+    def clean_worker(self):
+        worker = self.cleaned_data["worker"]
+        if not hasattr(worker, 'iv_data'):
+            raise ValidationError(
+                'User does not have "invoice extra data", please fill it!')
+        return worker
+
+
 class MonthlyInvoiceAdmin(MonthlyReportAdmin):
-    pass
+    form = MonthlyInvoiceAdminForm
 
 
 class TaskAdmin(admin.ModelAdmin):
