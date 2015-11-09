@@ -67,9 +67,14 @@ def create_project_user():
         **locals()))
 
     # add user to sudoers:
-    file_content = cStringIO.StringIO(
-        '{user}  ALL=NOPASSWD: /usr/sbin/service nginx reload\n'.format(
-            **locals()))
+    if cfg['System:os'] == 'ubuntu':
+        file_content = cStringIO.StringIO(
+            '{user}  ALL=NOPASSWD: /usr/sbin/service nginx reload\n'.format(
+                **locals()))
+    if cfg['System:os'] == 'arch':
+        file_content = cStringIO.StringIO(
+            '{user}  ALL=NOPASSWD: /usr/bin/systemctl reload nginx\n'.format(
+                **locals()))
 
     put(local_path=file_content, remote_path='/etc/sudoers.d/{user}'.format(
         **locals()))
@@ -255,7 +260,10 @@ def deploy(role):
 
 @setup_env()
 def reload_frontend():
-    sudo('service nginx reload', shell=False)
+    if cfg['System:os'] == 'ubuntu':
+        sudo('service nginx reload', shell=False)
+    if cfg['System:os'] == 'arch':
+        sudo('systemctl reload nginx', shell=False)
 
 
 @setup_env()
@@ -310,6 +318,21 @@ def publish_changes():
     put(local_path='/tmp/__changes.patch', remote_path='/tmp/__changes.patch')
     with cd('~/src'):
         run('git apply /tmp/__changes.patch')
+    execute(reload_project)
+
+
+@setup_env()
+def update():
+    execute(save_dump)
+    execute(reset_changes)
+    execute(update_configs)
+    execute(create_links_to_project_configs)
+    execute(install_python_requirements)
+    execute(remove_pyc)
+    execute(migrate)
+    execute(collectstatic)
+    execute(makemessages)
+    execute(compilemessages)
     execute(reload_project)
 
 
