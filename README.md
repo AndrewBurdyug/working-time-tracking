@@ -111,7 +111,7 @@ start all system services(Nginx, uWSGI backend, redis etc):
 open 'http://wktime.local/admin/' (or other wktime URL - depend on your settings in config.ini) in your browser, that's all!
 
 
-__DO NOT FORGET set the value of csrftoken cookie to your cookie_csrftoken, otherwise you get 403 HTTP Forbidden error!__
+__DO NOT FORGET set up the value of auth cookie, otherwise you get 403 HTTP Forbidden error!__
 
 
 

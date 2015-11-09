@@ -1,8 +1,12 @@
 [Main]
+; here base Django settings and some system settings (in future we'll move them
+; to section 'System', also 'Main' will rename to 'Django')
 project_name_dev = wktime.local
 project_name_live = wktime.example.org
+; ==== in future these would be in section 'System' ====
 ssh_dev = wktime.local
 ssh_live = wktime.example.org:22
+; ======================================================
 debug_dev = True
 debug_live = False
 timezone = Europe/Moscow
@@ -10,6 +14,9 @@ django_secret_key_dev = YourSecretRandomPhrase1
 django_secret_key_live = YourSecretRandomPhrase2
 
 [System]
+; here base system settings: OS type (actually you can choose between Ubuntu
+; and Archlinux, for Archlinux not yet implemented full deployment), user and
+; super user system accounts, home dir etc
 os_dev = ubuntu
 os_live = arch
 super_user = root
@@ -18,18 +25,31 @@ group = wktime
 home = /home/wktime
 
 [Git]
+; here configuration settings of project Git repo,
+; these settings will used during a deployment or update of project,
+; you can setup path to your own fork of project
 repo_path = ssh://git@gitlab.server.com/work-time-tracking.git
 server = gitlab.server.com:22
 
 [Nginx]
+; here configuration settings of Nginx, very basic configuration params,
+; for more details, please see deploy/configs/nginx_vhost.conf
 server_name_dev = wktime.local
 server_name_live = wktime.example.org
 access_log = ${System:home}/logs/nginx.access.log
 error_log = ${System:home}/logs/nginx.error.log
 error_log_level = info
 document_root = ${System:home}/src
-cookie_csrftoken = YourSecretRandomPhrase3
+; cookie with name 'auth' will use for access restriction:
+; http requests without this cookie will be forbidden
+; you can choose any other name, which you like more
+auth_cookie_name = auth
+auth_cookie_value = YourSecretRandomPhrase3
+
 
 [uWSGI]
+; here configuration settings of uWSGI,
+; tipically there is no need to change them,
+; for more details, please see deploy/configs/uwsgi.ini
 chdir = src
 wsgi_file = working_time/wsgi.py
