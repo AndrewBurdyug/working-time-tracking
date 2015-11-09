@@ -21,7 +21,6 @@ from .utils.pdf_helpers import inverse_y, draw_header, draw_items_header, \
 currency_sign = {
     'USD': '$',
     'EUR': unicodedata.lookup('EURO SIGN'),
-    'RUB': 'руб.'
     #  python unicodedata still not support ruble sign
     # 'RUB': unicodedata.lookup('RUBLE SIGN')
 }
