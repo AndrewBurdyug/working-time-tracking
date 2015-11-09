@@ -5,5 +5,5 @@ media
 backup
 static
 build
-local_settings.py
+./local_settings.py
 config.ini

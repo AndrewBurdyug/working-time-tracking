@@ -10,6 +10,8 @@ django_secret_key_dev = YourSecretRandomPhrase1
 django_secret_key_live = YourSecretRandomPhrase2
 
 [System]
+os_dev = ubuntu
+os_live = arch
 super_user = root
 user = wktime
 group = wktime

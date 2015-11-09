@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+import os
 import datetime
 import cStringIO
 from config import Config
@@ -6,7 +7,7 @@ from jinja2 import Environment, FileSystemLoader
 from fabric.api import env, run, put, prefix, prompt, cd, sudo, local, \
     execute
 
-cfg = Config('config.ini', 'dev')
+cfg = Config('config.ini', os.environ.get('WKTIME_INSTANCE_ROLE', 'dev'))
 
 
 def setup_env(root_priv=False):
@@ -27,29 +28,34 @@ def setup_env(root_priv=False):
 
 @setup_env(root_priv=True)
 def upgrade_os_and_install_system_packages():
-    system_packages = (
-        # system wide packages: python, Redis, etc:
-        'python3', 'python3-dev', 'python3-pip', 'python3-venv',
-        'wget', 'git', 'sudo', 'unzip', 'gettext',
-        'redis-server', 'sqlite3',
-        # libs:
-        'libmysqlclient-dev', 'libjpeg8-dev', 'libpng-dev', 'zlib1g-dev',
-        'libfreetype6-dev', 'libxml2-dev', 'libxslt1-dev', 'libpcre3-dev',
-        # special for PIL:
-        'libjbig0', 'liblcms2-2', 'libtiff5', 'libwebp5', 'libwebpmux1',
-        # special for nginx:
-        'libgeoip1',
-    )
+    if cfg['System:os'] == 'ubuntu':
+        system_packages = (
+            # system wide packages: python, Redis, etc:
+            'python3', 'python3-dev', 'python3-pip', 'python3-venv',
+            'wget', 'git', 'sudo', 'unzip', 'gettext',
+            'redis-server', 'sqlite3',
+            # libs:
+            'libmysqlclient-dev', 'libjpeg8-dev', 'libpng-dev', 'zlib1g-dev',
+            'libfreetype6-dev', 'libxml2-dev', 'libxslt1-dev', 'libpcre3-dev',
+            # special for PIL:
+            'libjbig0', 'liblcms2-2', 'libtiff5', 'libwebp5', 'libwebpmux1',
+            # special for nginx:
+            'libgeoip1',
+        )
 
-    # upgrade OS and install all needed software:
-    with prefix('export DEBIAN_FRONTEND=noninteractive'):
-        run('apt-get update -q -y && apt-get upgrade -q -y ')
-        run('apt-get install %s -q -y' % ' '.join(system_packages))
+        # upgrade OS and install all needed software:
+        with prefix('export DEBIAN_FRONTEND=noninteractive'):
+            run('apt-get update -q -y && apt-get upgrade -q -y ')
+            run('apt-get install %s -q -y' % ' '.join(system_packages))
 
-        # use custom ngnix with geoip:
-        run('wget -q http://pkg.chalenge.tk/'
-            'nginx_1.8.0-1~trusty_amd64.deb -P /usr/src')
-        run('dpkg -i /usr/src/nginx_1.8.0-1~trusty_amd64.deb')
+            # use custom ngnix with geoip:
+            run('wget -q http://pkg.chalenge.tk/'
+                'nginx_1.8.0-1~trusty_amd64.deb -P /usr/src')
+            run('dpkg -i /usr/src/nginx_1.8.0-1~trusty_amd64.deb')
+
+    if cfg['System:os'] == 'arch':
+        # Not yet implemented...
+        pass
 
 
 @setup_env(root_priv=True)
@@ -197,15 +203,23 @@ def add_to_logrotate_project_config():
 
 @setup_env(root_priv=True)
 def restart_services(service='all'):
-    if service == 'redis' or service == 'all':
-        run('service redis-server restart')
-        # run('systemctl restart redis-server')
-    if service == 'nginx' or service == 'all':
-        run('service nginx restart')
-        # run('systemctl restart nginx')
-    if service == 'uwsgi' or service == 'all':
-        # run('systemctl restart uwsgi-wktime')
-        execute(restart_uwsgi)
+    #  Docker Ubuntu 15.10 container still does not working properly
+    #  with systemd, so we still use SystemV init scripts:
+    if cfg['System:os'] == 'ubuntu':
+        if service == 'redis' or service == 'all':
+            run('service redis-server restart')
+        if service == 'nginx' or service == 'all':
+            run('service nginx restart')
+        if service == 'uwsgi' or service == 'all':
+            execute(restart_uwsgi)
+
+    if cfg['System:os'] == 'arch':
+        if service == 'redis' or service == 'all':
+            run('systemctl restart redis')
+        if service == 'nginx' or service == 'all':
+            run('systemctl restart nginx')
+        if service == 'uwsgi' or service == 'all':
+            run('systemctl restart uwsgi-wktime')
 
 
 @setup_env()
@@ -240,7 +254,7 @@ def deploy(role):
 # ====================================
 
 @setup_env()
-def reload_fronend():
+def reload_frontend():
     sudo('service nginx reload', shell=False)
 
 
@@ -253,7 +267,7 @@ def reload_backend():
 @setup_env()
 def reload_project():
     reload_backend()
-    reload_fronend()
+    reload_frontend()
 
 
 @setup_env()
