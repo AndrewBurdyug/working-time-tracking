@@ -5,7 +5,8 @@ from django.contrib.auth.admin import UserAdmin
 from django.core.exceptions import ValidationError
 from django.utils.timezone import get_current_timezone
 from .models import SpentTime, Category, Task, Project, MonthlyReport, \
-    MonthlyInvoice, Company, CompanyInvoiceData, UserInvoiceData, Salary
+    MonthlyInvoice, Company, CompanyInvoiceData, UserInvoiceData, Salary, \
+    Bonus
 
 
 tz = get_current_timezone()
@@ -112,3 +113,4 @@ admin.site.register(Company, CompanyAdmin)
 admin.site.unregister(UserModel)
 admin.site.register(UserModel, ExtendedUserAdmin)
 admin.site.register(Salary)
+admin.site.register(Bonus)

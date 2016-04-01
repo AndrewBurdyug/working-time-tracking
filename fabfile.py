@@ -291,7 +291,8 @@ def remove_pyc():
 @setup_env()
 def reset_changes():
     with cd('~/src'):
-        run('git clean -fd -e deploy/build && git checkout -- . && git pull')
+        run('git clean -fd -e deploy/build -e local_settings.py '
+            '&& git checkout -- . && git pull')
 
 
 def create_patch(branch=None):

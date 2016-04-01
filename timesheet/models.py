@@ -15,7 +15,7 @@ from .utils.datetime_helpers import tz, current_datetime, current_month, \
 
 from .utils.pdf_helpers import inverse_y, draw_header, draw_items_header, \
     draw_legal_parties_info, draw_item, draw_items, draw_footer, draw, \
-    create_invoice
+    create_invoice, draw_bonuses
 
 
 currency_sign = {
@@ -217,6 +217,8 @@ class MonthlyInvoice(models.Model):
     amount_equivalent = models.FloatField(blank=True, null=True)
     date = models.DateTimeField(default=current_datetime,
                                 help_text='invoice sending date')
+    timestamp = models.DateTimeField(default=current_datetime,
+                                     help_text='invoice timestamp')
     number = models.PositiveSmallIntegerField(default=1)
 
     @property
@@ -301,6 +303,11 @@ class MonthlyInvoice(models.Model):
                     worker_total_amount, project_info['currency'])
         return '?0.00'
 
+    @property
+    def bonuses(self):
+        return self.company.bonuses.filter(
+            date__year=self.year, date__month=self.month, worker=self.worker)
+
     def save(self, *args, **kwargs):
         if self.filename:
             self.filename.delete(save=False)
@@ -317,6 +324,7 @@ class MonthlyInvoice(models.Model):
     draw_footer = draw_footer
     draw = draw
     create_invoice = create_invoice
+    draw_bonuses = draw_bonuses
 
     def __str__(self):
         return self.title
@@ -370,3 +378,28 @@ class Salary(models.Model):
     class Meta:
         verbose_name = 'salary'
         verbose_name_plural = 'salaries'
+
+
+class Bonus(models.Model):
+    """
+    Bonuses! =)
+    """
+    amount = models.FloatField()
+    currency = models.CharField(max_length=3, choices=CURRENCY)
+    worker = models.ForeignKey(settings.AUTH_USER_MODEL)
+    company = models.ForeignKey('Company', related_name='bonuses')
+    date = models.DateTimeField(default=current_datetime,
+                                help_text='bonus date')
+
+    @property
+    def currency_sign(self):
+        return currency_sign.get(self.currency, '?')
+
+    def __str__(self):
+        return '%s - %.2f %s %s' % (
+            self.worker, self.amount, self.currency,
+            self.date.strftime('%Y-%m-%d'))
+
+    class Meta:
+        verbose_name = 'bonus'
+        verbose_name_plural = 'bonuses'

@@ -1,5 +1,4 @@
 import os.path
-import time
 
 from reportlab.pdfgen import canvas
 from reportlab.lib.colors import green, black, gray
@@ -148,50 +147,105 @@ def draw_items(self):
         self.projects_count = item_number - 1
 
 
+def draw_bonuses(self):
+    self.pdf.setFont("Helvetica", 9)
+    self.pdf.setFillColorRGB(0.3, 0.3, 0.3)
+
+    if self.bonuses:
+        for bonus_number, bonus in enumerate(self.bonuses, 1):
+            item_number = self.projects_count + 1 + bonus_number
+            self.pdf.drawString(
+                25, self.inverse_y(252 + 42 * (item_number - 1)), '[bonuses]')
+            if bonus.currency != 'RUB':
+                self.pdf.drawString(
+                    25, self.inverse_y(265 + 42 * (item_number - 1)),
+                    "%d.   Amount: %s%.2f" % (
+                        item_number, bonus.currency_sign, bonus.amount))
+            else:
+                self.pdf.drawString(
+                    25, self.inverse_y(265 + 42 * (item_number - 1)),
+                    "%d.   Amount: %.2f RUB" % (
+                        item_number, bonus.currency_sign, bonus.amount))
+
+            # self.pdf.drawString(
+            #     325, self.inverse_y(265 + 42 * (item_number - 1)),
+            #     self.date.strftime("%b %d, %Y"))
+
+            # self.pdf.drawString(
+            #     465, self.inverse_y(265 + 42 * (item_number - 1)),
+            #     "%s%.2f" % (bonus.currency_sign, bonus.amount))
+
+
 def draw_footer(self):
+    shift = self.projects_count + len(self.bonuses)
 
     self.pdf.setStrokeColor(gray)
     self.pdf.rect(
-        290, self.inverse_y(350 + 42 * self.projects_count), 250, 60, stroke=1)
+        290, self.inverse_y(350 + 42 * shift), 250, 60, stroke=1)
     self.pdf.rect(
-        290, self.inverse_y(350 + 42 * self.projects_count), 250, 20, stroke=1)
+        290, self.inverse_y(350 + 42 * shift), 250, 20, stroke=1)
+
+    if self.bonuses:
+        self.pdf.rect(
+            290, self.inverse_y(370 + 42 * shift), 250, 20, stroke=1)
 
     self.pdf.setFont("Helvetica-Bold", 9)
     self.pdf.setFillColor(black)
     self.pdf.drawString(
-        322, self.inverse_y(305 + 42 * self.projects_count), "Invoice Total")
+        322, self.inverse_y(305 + 42 * shift), "Invoice Total")
     self.pdf.drawString(
-        322, self.inverse_y(322 + 42 * self.projects_count), "Paid to Date")
+        322, self.inverse_y(322 + 42 * shift), "Paid to Date")
     if self.amount_eq:
-        self.pdf.drawString(
-            322, self.inverse_y(342 + 42 * self.projects_count),
-            "Balance in %s equivalent" %
-            self.get_currency_equivalent_display().upper())
+        if self.bonuses:
+            self.pdf.drawString(
+                322, self.inverse_y(342 + 42 * shift), "Bonuses")
+            self.pdf.drawString(
+                322, self.inverse_y(359 + 42 * shift),
+                "Balance in %s equivalent" %
+                self.get_currency_equivalent_display().upper())
+
+        else:
+            self.pdf.drawString(
+                322, self.inverse_y(342 + 42 * shift),
+                "Balance in %s equivalent" %
+                self.get_currency_equivalent_display().upper())
     else:
         self.pdf.drawString(
-            322, self.inverse_y(342 + 42 * self.projects_count), "Balance")
+            322, self.inverse_y(342 + 42 * shift), "Balance")
 
     self.pdf.setFont("Helvetica", 9)
     self.pdf.setFillColorRGB(0.3, 0.3, 0.3)
     self.pdf.drawString(
-        465, self.inverse_y(305 + 42 * self.projects_count), self.amount)
+        465, self.inverse_y(305 + 42 * shift), self.amount)
     self.pdf.drawString(
-        465, self.inverse_y(322 + 42 * self.projects_count), self.amount)
+        465, self.inverse_y(322 + 42 * shift), self.amount)
+
+    if self.bonuses:
+        self.pdf.drawString(
+            465, self.inverse_y(342 + 42 * shift),
+            '%s%.2f' % (
+                self.bonuses[0].currency_sign, self.bonuses[0].amount))
 
     self.pdf.setFont("Helvetica-Bold", 9)
     self.pdf.setFillColor(black)
 
     if self.amount_eq:
-        self.pdf.drawString(
-            465, self.inverse_y(342 + 42 * self.projects_count),
-            self.amount_eq)
+        if self.bonuses:
+            self.pdf.drawString(
+                465, self.inverse_y(359 + 42 * shift),
+                self.amount_eq)
+        else:
+            self.pdf.drawString(
+                465, self.inverse_y(342 + 42 * shift),
+                self.amount_eq)
+
     else:
         self.pdf.drawString(
-            465, self.inverse_y(342 + 42 * self.projects_count), self.amount)
+            465, self.inverse_y(342 + 42 * shift), self.amount)
 
     self.pdf.setFont("Helvetica", 9)
     self.pdf.setFillColorRGB(0.3, 0.3, 0.3)
-    self.pdf.drawString(10, 10, time.strftime('%c %Z', time.localtime()))
+    self.pdf.drawString(10, 10, self.timestamp.strftime('%c %Z'))
 
 
 def draw(self):
@@ -199,6 +253,7 @@ def draw(self):
     self.draw_legal_parties_info()
     self.draw_items_header()
     self.draw_items()
+    self.draw_bonuses()
     self.draw_footer()
 
 
