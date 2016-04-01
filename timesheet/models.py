@@ -58,7 +58,7 @@ class SpentTime(models.Model):
         salary = self.task.project.company.salary_set.filter(
             worker=self.worker)
         if salary:
-            return '%.2f %s' % (self.duration * salary[0].hourly_rate,
+            return '%.3f %s' % (self.duration * salary[0].hourly_rate,
                                 salary[0].currency)
         return '-//-'
 
