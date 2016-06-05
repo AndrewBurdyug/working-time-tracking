@@ -21,11 +21,11 @@ class Command(BaseCommand):
         if things == 'reports':
             for item in MonthlyReport.objects.all():
                 item.save()
-                return
+            return
 
         if things == 'invoices':
             for item in MonthlyInvoice.objects.all():
                 item.save()
-                return
+            return
 
         raise CommandError('I do not known what doing with "%s"' % things)

@@ -261,7 +261,4 @@ def create_invoice(self):
     self.draw()
     self.pdf.showPage()
     self.pdf.save()
-
-    # !!! need rectoring !!!
-    # filename like './media/invoices/user_Comp_Oct_2015_Invoice.pdf'
-    return self.pdf_filename.split('./media/')[1]
+    return '/media/invoices/' + self.title
