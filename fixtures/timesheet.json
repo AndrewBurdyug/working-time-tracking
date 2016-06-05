@@ -1,0 +1,379 @@
+[
+{
+    "fields": {
+        "duration": 1.8,
+        "start_time": "2016-06-01T05:52:25Z",
+        "task": 1,
+        "end_time": "2016-06-01T07:40:25Z",
+        "comment": "compare hosters, choose cheap hosting",
+        "worker": 3
+    },
+    "model": "timesheet.spenttime",
+    "pk": 1
+},
+{
+    "fields": {
+        "duration": 0.6,
+        "start_time": "2016-06-01T08:15:34Z",
+        "task": 1,
+        "end_time": "2016-06-01T08:51:34Z",
+        "comment": "setting up server",
+        "worker": 3
+    },
+    "model": "timesheet.spenttime",
+    "pk": 2
+},
+{
+    "fields": {
+        "duration": 2.3,
+        "start_time": "2016-06-01T09:30:11Z",
+        "task": 1,
+        "end_time": "2016-06-01T11:48:11Z",
+        "comment": "testing mass email sending, tuning of network settings",
+        "worker": 3
+    },
+    "model": "timesheet.spenttime",
+    "pk": 3
+},
+{
+    "fields": {
+        "duration": 3.7,
+        "start_time": "2016-06-05T13:45:11Z",
+        "task": 2,
+        "end_time": "2016-06-05T17:27:11Z",
+        "comment": "write wiki",
+        "worker": 2
+    },
+    "model": "timesheet.spenttime",
+    "pk": 4
+},
+{
+    "fields": {
+        "duration": 4.6,
+        "start_time": "2016-06-05T09:22:11Z",
+        "task": 3,
+        "end_time": "2016-06-05T13:58:11Z",
+        "comment": "draw mockups for login page, dashboard",
+        "worker": 2
+    },
+    "model": "timesheet.spenttime",
+    "pk": 5
+},
+{
+    "fields": {
+        "duration": 0.4,
+        "start_time": "2016-06-01T07:40:01Z",
+        "task": 1,
+        "end_time": "2016-06-01T08:04:01Z",
+        "comment": "choose hosting and buy the dedicated server",
+        "worker": 4
+    },
+    "model": "timesheet.spenttime",
+    "pk": 6
+},
+{
+    "fields": {
+        "duration": 1.9,
+        "start_time": "2016-06-01T06:08:34Z",
+        "task": 4,
+        "end_time": "2016-06-01T08:02:34Z",
+        "comment": "fix errors",
+        "worker": 2
+    },
+    "model": "timesheet.spenttime",
+    "pk": 7
+},
+{
+    "fields": {
+        "progress": 78,
+        "assigned": 3,
+        "start_date": "2016-06-05",
+        "title": "#1 Buy server",
+        "project": 3,
+        "priority": 2,
+        "category": 2,
+        "status": 0
+    },
+    "model": "timesheet.task",
+    "pk": 1
+},
+{
+    "fields": {
+        "progress": 20,
+        "assigned": 2,
+        "start_date": "2016-06-05",
+        "title": "Write docs",
+        "project": 1,
+        "priority": 0,
+        "category": null,
+        "status": 1
+    },
+    "model": "timesheet.task",
+    "pk": 2
+},
+{
+    "fields": {
+        "progress": 12,
+        "assigned": 2,
+        "start_date": "2016-06-05",
+        "title": "Create mockups",
+        "project": 1,
+        "priority": 1,
+        "category": 4,
+        "status": 1
+    },
+    "model": "timesheet.task",
+    "pk": 3
+},
+{
+    "fields": {
+        "progress": 100,
+        "assigned": 2,
+        "start_date": "2016-06-01",
+        "title": "Login page errors",
+        "project": 2,
+        "priority": 1,
+        "category": 3,
+        "status": 2
+    },
+    "model": "timesheet.task",
+    "pk": 4
+},
+{
+    "fields": {
+        "title": "Translation",
+        "project": 3
+    },
+    "model": "timesheet.category",
+    "pk": 1
+},
+{
+    "fields": {
+        "title": "Email sending",
+        "project": 3
+    },
+    "model": "timesheet.category",
+    "pk": 2
+},
+{
+    "fields": {
+        "title": "Bug",
+        "project": 2
+    },
+    "model": "timesheet.category",
+    "pk": 3
+},
+{
+    "fields": {
+        "title": "Issue",
+        "project": 2
+    },
+    "model": "timesheet.category",
+    "pk": 4
+},
+{
+    "fields": {
+        "title": "Feature",
+        "project": 2
+    },
+    "model": "timesheet.category",
+    "pk": 5
+},
+{
+    "fields": {
+        "description": "Some project of some company",
+        "company": 1,
+        "title": "Some project"
+    },
+    "model": "timesheet.project",
+    "pk": 1
+},
+{
+    "fields": {
+        "description": "Other project of some company",
+        "company": 1,
+        "title": "Other Project"
+    },
+    "model": "timesheet.project",
+    "pk": 2
+},
+{
+    "fields": {
+        "description": "Sending news for our community",
+        "company": 2,
+        "title": "News"
+    },
+    "model": "timesheet.project",
+    "pk": 3
+},
+{
+    "fields": {
+        "description": "Some company description",
+        "abbr": "SC",
+        "title": "Some Company"
+    },
+    "model": "timesheet.company",
+    "pk": 1
+},
+{
+    "fields": {
+        "description": "Other company description",
+        "abbr": "OC",
+        "title": "Other Company"
+    },
+    "model": "timesheet.company",
+    "pk": 2
+},
+{
+    "fields": {
+        "worker": 3,
+        "year": 2016,
+        "filename": "reports/ot_user_News_Jun_2016.txt",
+        "month": 6,
+        "project": 3
+    },
+    "model": "timesheet.monthlyreport",
+    "pk": 1
+},
+{
+    "fields": {
+        "worker": 2,
+        "year": 2016,
+        "filename": "reports/sm_user_Other_Project_Jun_2016.txt",
+        "month": 6,
+        "project": 2
+    },
+    "model": "timesheet.monthlyreport",
+    "pk": 2
+},
+{
+    "fields": {
+        "worker": 2,
+        "year": 2016,
+        "filename": "reports/sm_user_Some_project_Jun_2016.txt",
+        "month": 6,
+        "project": 1
+    },
+    "model": "timesheet.monthlyreport",
+    "pk": 3
+},
+{
+    "fields": {
+        "date": "2016-06-05T06:12:00Z",
+        "number": 1,
+        "year": 2016,
+        "amount_equivalent": null,
+        "month": 6,
+        "company": 2,
+        "currency_equivalent": null,
+        "filename": "invoices/ot_user_OC_Jun_2016_Invoice.pdf",
+        "worker": 3,
+        "timestamp": "2016-06-05T06:12:00Z"
+    },
+    "model": "timesheet.monthlyinvoice",
+    "pk": 1
+},
+{
+    "fields": {
+        "date": "2016-06-05T06:17:54Z",
+        "number": 1,
+        "year": 2016,
+        "amount_equivalent": 20.64,
+        "month": 6,
+        "company": 1,
+        "currency_equivalent": "EUR",
+        "filename": "invoices/sm_user_SC_Jun_2016_Invoice.pdf",
+        "worker": 2,
+        "timestamp": "2016-06-05T06:17:54Z"
+    },
+    "model": "timesheet.monthlyinvoice",
+    "pk": 2
+},
+{
+    "fields": {
+        "tax_or_vat_id": "122323",
+        "mention_name": "some user mention name",
+        "entity": 2,
+        "contact_name": "some user contact name",
+        "phone": "122-12-334-566",
+        "paypal": "0090909",
+        "address": "some user address"
+    },
+    "model": "timesheet.userinvoicedata",
+    "pk": 1
+},
+{
+    "fields": {
+        "tax_or_vat_id": "121212",
+        "mention_name": "other user mention name",
+        "entity": 3,
+        "contact_name": "other user contact name",
+        "phone": "555-566-7565",
+        "paypal": "09444444",
+        "address": "other user address"
+    },
+    "model": "timesheet.userinvoicedata",
+    "pk": 2
+},
+{
+    "fields": {
+        "tax_or_vat_id": "121334",
+        "mention_name": "watcher mention name",
+        "entity": 4,
+        "contact_name": "watcher contact name",
+        "phone": "656-566-6-666",
+        "paypal": "3309874",
+        "address": "watcher address"
+    },
+    "model": "timesheet.userinvoicedata",
+    "pk": 3
+},
+{
+    "fields": {
+        "tax_or_vat_id": "12345",
+        "mention_name": "some company mention name",
+        "entity": 1,
+        "contact_name": "some company conact name",
+        "phone": "111-222-333-444",
+        "paypal": "1234567",
+        "address": "some company address"
+    },
+    "model": "timesheet.companyinvoicedata",
+    "pk": 1
+},
+{
+    "fields": {
+        "tax_or_vat_id": "122233",
+        "mention_name": "other company mention name",
+        "entity": 2,
+        "contact_name": "other company contact name",
+        "phone": "124-565-4577",
+        "paypal": "899898",
+        "address": "other company address"
+    },
+    "model": "timesheet.companyinvoicedata",
+    "pk": 2
+},
+{
+    "fields": {
+        "currency": "USD",
+        "company": 2,
+        "hourly_rate": 28.78,
+        "worker": 3,
+        "position": "CTO"
+    },
+    "model": "timesheet.salary",
+    "pk": 1
+},
+{
+    "fields": {
+        "currency": "USD",
+        "company": 1,
+        "hourly_rate": 2.3,
+        "worker": 2,
+        "position": "junior php developer"
+    },
+    "model": "timesheet.salary",
+    "pk": 2
+}
+]
