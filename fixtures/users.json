@@ -3,54 +3,72 @@
     "model": "auth.user",
     "pk": 2,
     "fields": {
-        "password": "pbkdf2_sha256$20000$lzV2XYa41SJ2$M45gBWDxmyNY7DeKDMm1z1R3RPnRkcgyHXAlRuAbeFs=",
-        "last_login": null,
+        "password": "pbkdf2_sha256$24000$eYX2gxXTwWin$N1r1F4zoVYsHc30ndAbiFeffXSOjHl4fjofFYDJx/cc=",
+        "last_login": "2016-06-05T07:55:48.240Z",
         "is_superuser": false,
         "username": "sm_user",
         "first_name": "",
         "last_name": "",
         "email": "",
-        "is_staff": false,
+        "is_staff": true,
         "is_active": true,
-        "date_joined": "2016-06-05T05:49:37.666Z",
+        "date_joined": "2016-06-05T05:49:37Z",
         "groups": [],
-        "user_permissions": []
+        "user_permissions": [
+            19,
+            20,
+            21
+        ]
     }
 },
 {
     "model": "auth.user",
     "pk": 3,
     "fields": {
-        "password": "pbkdf2_sha256$20000$OqhhdPEcVXA5$A4wsHa49WiXYyzxZbQzTMsAQoezrJ1PYgDQmJ4savlI=",
-        "last_login": null,
+        "password": "pbkdf2_sha256$24000$hq29i7DU7n0Z$qp/FxqMHJCFc1KY3DyNDl8uaXemlQPfNg40I3lq+ys4=",
+        "last_login": "2016-06-05T07:56:52.721Z",
         "is_superuser": false,
         "username": "ot_user",
         "first_name": "",
         "last_name": "",
         "email": "",
-        "is_staff": false,
+        "is_staff": true,
         "is_active": true,
-        "date_joined": "2016-06-05T05:50:51.921Z",
+        "date_joined": "2016-06-05T05:50:51Z",
         "groups": [],
-        "user_permissions": []
+        "user_permissions": [
+            19,
+            20,
+            21
+        ]
     }
 },
 {
     "model": "auth.user",
     "pk": 4,
     "fields": {
-        "password": "pbkdf2_sha256$20000$ZkL2oIihBCf2$ufaYo/rzMJ7H3NIdgQ6oHlv7tm9WvjeWHmdpIfPiH+I=",
-        "last_login": null,
+        "password": "pbkdf2_sha256$24000$aJ21hDIeFDZ6$LLTQnPh/+6NMVsSIEFMTAiCEIcVcd9MV+47Vb60/fVQ=",
+        "last_login": "2016-06-05T07:59:12.417Z",
         "is_superuser": false,
         "username": "watcher",
         "first_name": "",
         "last_name": "",
         "email": "",
-        "is_staff": false,
+        "is_staff": true,
         "is_active": true,
-        "date_joined": "2016-06-05T06:07:59.178Z",
+        "date_joined": "2016-06-05T06:07:59Z",
         "groups": [],
-        "user_permissions": []
+        "user_permissions": [
+            19,
+            20,
+            21,
+            28,
+            29,
+            30,
+            22,
+            23,
+            24
+        ]
     }
 }
 ]
