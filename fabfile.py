@@ -159,12 +159,6 @@ def create_links_to_project_configs():
 
 
 @setup_env()
-def syncdb():
-    with cd('~/src'):
-        run('./manage.py syncdb')
-
-
-@setup_env()
 def migrate():
     with cd('~/src'):
         run('./manage.py migrate')
@@ -246,7 +240,6 @@ def deploy(role):
     execute(install_python_requirements)
     execute(create_links_to_project_configs)
     execute(restart_services, 'redis')
-    execute(syncdb)
     execute(migrate)
     execute(collectstatic)
     execute(makemessages)
