@@ -330,6 +330,14 @@ def update():
     execute(reload_project)
 
 
+@setup_env()
+def loaddata():
+    with cd('~/src'):
+        run('./manage.py loaddata fixtures/users.json fixtures/timesheet.json')
+        run('./manage.py regenerate reports')
+        run('./manage.py regenerate invoices')
+
+
 def docker_run_ct():
     local('docker network create -d bridge --subnet 172.31.0.0/16 wktime_nw')
     local('docker run --net=wktime_nw --ip=172.31.1.1 -ti --privileged '
