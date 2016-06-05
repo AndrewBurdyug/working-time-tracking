@@ -50,7 +50,7 @@ $ . ~/envs/py2/bin/activate
 Clone project, create your personal config and change default settings:
 
 ```shell
-(py2)$ git clone ssh://git@gitlab.server.com/work-time-tracking.git
+(py2)$ git clone git@github.com:AndrewBurdyug/working-time-tracking.git
 (py2)$ cd work-time-tracking
 (py2)$ cp config.ini.example config.ini
 ```
@@ -64,25 +64,29 @@ pull Ubuntu 15.10 image and run wktime docker container, example:
 ```shell
 (py2)$ docker pull ubuntu:15.10
 (py2)$ fab docker_run_ct
-[localhost] local: weave launch -iprange 192.168.2.0/24
-d1e8a3cded7a2df92556a93194380b214c2b38989b1fbd5e9c6af2c704f45565
-[localhost] local: weave run 192.168.2.100/24 -ti --privileged -v /sys/fs/cgroup:/sys/fs/cgroup:ro --name=wktime --hostname=wktime.local ubuntu:15.10 /bin/bash
-39531e8b6e59bc8024cd9719bd5f725ed4b8757be2c2b92209a3760144a4e218
-[localhost] local: sudo ip addr a 192.168.2.251/24 dev weave
+70938076b50e97f3c32960082471c3d774fb856a549ca0024c38c908b7d17785
+[localhost] local: docker run --net=wktime_nw --ip=172.31.1.1 -ti --privileged -v /sys/fs/cgroup:/sys/fs/cgroup:ro --name=wktime --hostname=wktime.local ubuntu:15.10 /bin/bash
+root@wktime:/#
+```
 
-Done.
-(py2)$ echo "192.168.2.100 wktime.local" >> /etc/hosts
+now you should install ssh server and make deploy into this local VM:
+
+```shell
+root@wktime:/# apt-get update && apt-get install -y openssh-server && service ssh start
+```
+
+```shell
+(py2)$ echo "172.31.1.1 wktime.local" | sudo tee --append /etc/hosts
 (py2)$ ping -c 2 wktime.local
-PING wktime.local (192.168.2.100) 56(84) bytes of data.
-64 bytes from wktime.local (192.168.2.100): icmp_seq=1 ttl=64 time=0.139 ms
-64 bytes from wktime.local (192.168.2.100): icmp_seq=2 ttl=64 time=0.062 ms
+PING wktime.local (172.31.1.1) 56(84) bytes of data.
+64 bytes from wktime.local (172.31.1.1): icmp_seq=1 ttl=64 time=0.085 ms
+64 bytes from wktime.local (172.31.1.1): icmp_seq=2 ttl=64 time=0.086 ms
 
 --- wktime.local ping statistics ---
 2 packets transmitted, 2 received, 0% packet loss, time 999ms
-rtt min/avg/max/mdev = 0.062/0.100/0.139/0.039 ms
+rtt min/avg/max/mdev = 0.085/0.085/0.086/0.009 ms
 ```
 
-then install and run SSH server inside this docker container,
 add to /root/.ssh/authorized_keys your public SSH key,
 go to the next section "deployment"
 

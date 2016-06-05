@@ -338,14 +338,11 @@ def update():
 
 
 def docker_run_ct():
-    local('weave launch -iprange 192.168.2.0/24')
-    local('weave run 192.168.2.100/24 -ti --privileged '
+    local('docker network create -d bridge --subnet 172.31.0.0/16 wktime_nw')
+    local('docker run --net=wktime_nw --ip=172.31.1.1 -ti --privileged '
           '-v /sys/fs/cgroup:/sys/fs/cgroup:ro --name=wktime '
           '--hostname=wktime.local ubuntu:15.10 /bin/bash')
-    local('sudo ip addr a 192.168.2.251/24 dev weave')
 
 
 def docker_start_ct():
-    local('weave launch -iprange 192.168.2.0/24')
-    local('weave start 192.168.2.100/24 wktime')
-    local('sudo ip addr a 192.168.2.251/24 dev weave')
+    local('docker start wktime')
