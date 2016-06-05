@@ -1,8 +1,8 @@
-Django==1.8.4
-django-admin-bootstrapped==2.5.4
-django-cacheops==2.4
-ipython==4.0.0
-pytz==2015.4
-reportlab==3.2.0
-uWSGI==2.0.11.1
+django-admin-bootstrapped==2.5.7
+Django==1.9.7
+django-cacheops==2.4.4
+ipython==4.2.0
+pytz==2016.4
+reportlab==3.3.0
+uWSGI==2.0.13.1
 #configparser==3.3.0.post2

@@ -9,9 +9,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # DEBUG = False
 
 # WARNING: override by the local_settings.py
-# TEMPLATE_DEBUG = False
-
-# WARNING: override by the local_settings.py
 # ALLOWED_HOSTS = []
 
 
@@ -86,9 +83,28 @@ MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, 'templates'),
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates'),
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'debug': False,
+            'context_processors': [
+                'django.contrib.auth.context_processors.auth',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.template.context_processors.tz',
+                'django.template.context_processors.request',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
 
 LOCALE_PATHS = (os.path.join(BASE_DIR, 'locale'), )
 
