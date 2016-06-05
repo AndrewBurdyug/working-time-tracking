@@ -1,6 +1,24 @@
 [
 {
     "model": "auth.user",
+    "pk": 1,
+    "fields": {
+        "password": "pbkdf2_sha256$24000$OMBYTigjfTD3$ZMKgBPR3R14ep0kf/Y7ovAl98um50C7WoUnKtFk8lhg=",
+        "last_login": "2016-06-05T18:33:46.130Z",
+        "is_superuser": true,
+        "username": "admin",
+        "first_name": "",
+        "last_name": "",
+        "email": "admin@example.org",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2016-06-05T18:33:39.985Z",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "auth.user",
     "pk": 2,
     "fields": {
         "password": "pbkdf2_sha256$24000$eYX2gxXTwWin$N1r1F4zoVYsHc30ndAbiFeffXSOjHl4fjofFYDJx/cc=",
