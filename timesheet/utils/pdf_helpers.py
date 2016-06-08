@@ -261,4 +261,4 @@ def create_invoice(self):
     self.draw()
     self.pdf.showPage()
     self.pdf.save()
-    return '/media/invoices/' + self.title
+    return 'invoices/' + self.title
