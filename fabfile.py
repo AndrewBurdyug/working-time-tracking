@@ -343,7 +343,11 @@ def docker_run_ct():
     local('docker run --net=wktime_nw --ip=172.31.1.1 -ti --privileged '
           '-v /sys/fs/cgroup:/sys/fs/cgroup:ro --name=wktime '
           '--hostname=wktime.local ubuntu:15.10 /bin/bash')
+    local('docker exec wktime service ssh start ')
+    execute(restart_services)
 
 
 def docker_start_ct():
     local('docker start wktime')
+    local('docker exec wktime service ssh start ')
+    execute(restart_services)
